@@ -26,10 +26,10 @@ while read NED_filename
 do
   NED=$(echo ${NED_filename} | tr "/" "\n" | tail -1)
   echo $NED
-  # wget ${NED_filename} -O ${out_dir}/${NED}
+  wget ${NED_filename} -O ${out_dir}/${NED}
   # unzip ${out_dir}/${NED}
 done < ${GCS_file}
 
-# if $cleanup ; then
-#     rm GCS_coords.txt
-# fi
+if $cleanup ; then
+    rm GCS_coords.txt
+fi
