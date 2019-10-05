@@ -100,7 +100,7 @@ def ReprojectCoords(coords, src_srs, tgt_srs):
     return trans_coords
 
 try:
-    xml = in_fn[-3:]+'XML'
+    xml = in_fn[:-3]+'xml'
     # if in_fn[-3:] == 'XML':
     #     xml=in_fn
     # else:
