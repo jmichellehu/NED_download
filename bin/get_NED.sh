@@ -16,6 +16,7 @@ cleanup=true
 
 # Extract geographic coordinates for the input image
 GCS_file=GCS_coords.txt
+NED_names=NED.txt
 
 python $HOME/git_dirs/NED_download/bin/get_NED.py -in ${img} -NED 13 2>&1 | tee ${GCS_file}
 
@@ -24,7 +25,7 @@ echo "Downloading DEMs..."
 while read NED_filename
 do
   NED=$(echo ${NED_filename} | tr "/" "\n" | tail -1)
-  echo $NED
+  echo ${NED%.*} | tee ${NED_names}
   wget ${NED_filename} -O ${out_dir}/${NED}
   # unzip -o ${out_dir}/${NED}
 done < ${GCS_file}
