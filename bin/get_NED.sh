@@ -25,8 +25,8 @@ echo "Downloading DEMs..."
 while read NED_filename
 do
   NED=$(echo ${NED_filename} | tr "/" "\n" | tail -1)
-  echo ${NED%.*} | tee ${NED_names}
-  wget ${NED_filename} -O ${out_dir}/${NED}
+  echo ${NED%.*} &>> ${NED_names}
+  # wget ${NED_filename} -O ${out_dir}/${NED}
   # unzip -o ${out_dir}/${NED}
 done < ${GCS_file}
 
