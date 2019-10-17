@@ -81,18 +81,6 @@ do
     
 done < ${GCS_file}
 
-# Gdalbuildvrt doesn't support multiple projections, will need to think about this one.
-# Can maybe leave this out for now...
-# vrt_name=${img%.*}_NED_13.vrt
-# if [ ! -f ${vrt_name} ]; then
-#     echo "Building vrt of dems..."
-#     # Build vrt of image
-#     gdalbuildvrt -input_file_list ${dem_list} ${vrt_name}
-# else
-#     echo "NED vrt already exists"
-# fi
-
-
 if $cleanup ; then
     rm ${NED_names}
     rm ${GCS_file}
