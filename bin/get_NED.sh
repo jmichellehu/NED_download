@@ -30,12 +30,13 @@ dem_list=dem_list.txt
 # Extract geographic coordinates for the input image
 python $HOME/git_dirs/NED_download/bin/get_NED.py -in ${img} -NED 13 2>&1 | tee ${GCS_file}
 
-echo "Downloading DEMs..."
+echo "Checking for NED files..."
 
 while read NED_filename
 do
     NED=$(echo ${NED_filename} | tr "/" "\n" | tail -1)
     echo ${NED%.*} &>> ${NED_names}
+
     # Rename alternate .img name to conventional USGS... format
     standard_name=$(echo ${NED_filename} | tr "/" "\n" | tail -n 1)
     standard_name=${standard_name%.*}.img
@@ -45,23 +46,29 @@ do
     if  [ -f ${standard_name} ] ; then
         echo "File exists, skip downloading..."
     else
-        # Grab the standard version and unzip
-        if wget ${NED_filename} -O ${out_dir}/${NED} ; then
-            echo "USGS* version exists"
-            unzip -o ${out_dir}${NED} -d ${out_dir}
-        # Grab the non-standard version, unzip and rename
-        else 
-            echo "USGS* version doesn't exist, trying other naming scheme"
-            bucket=$(echo ${NED_filename} | tr "U" "\n" | head -n 1)
-            tile=$(echo ${NED_filename} | tr "_" "\n"| tail -n 2 | head -n 1)
-            NED_alt_filename=${bucket}${tile}.zip
+        if [ ! -e ${out_dir}${NED} ] ; then
+            # Grab the standard version and unzip
+            if wget ${NED_filename} -O ${out_dir}/${NED} ; then
+                echo "USGS* version exists"
+            # Grab the non-standard version, unzip and rename
+            else 
+                echo "USGS* version doesn't exist, trying other naming scheme"
+                bucket=$(echo ${NED_filename} | tr "U" "\n" | head -n 1)
+                tile=$(echo ${NED_filename} | tr "_" "\n"| tail -n 2 | head -n 1)
+                NED_alt_filename=${bucket}${tile}.zip
 
-            wget ${NED_alt_filename} -O ${out_dir}${NED}
+                wget ${NED_alt_filename} -O ${out_dir}${NED}
+            fi
+        else
             unzip -o ${out_dir}${NED} -d ${out_dir}
+        fi
+
+        if [ -e ${out_dir}img${tile}*.img ] ; then
             mv ${out_dir}img${tile}*.img ${out_dir}${standard_name}
+            rm -rfv ${tile}/
         fi
         # Copy to flat file directory
-        cp ${out_dir}${standard_name} .
+        #cp ${out_dir}${standard_name} .
         
     fi
 
@@ -84,11 +91,25 @@ do
         fi
         #gdalwarp -co COMPRESS=LZW -co TILED=YES -co BIGTIFF=IF_SAFER -overwrite -r cubic -t_srs EPSG:${zone} -dstnodata -9999 -tr 10 10 ${NED%.*}-adj.tif ${dem}
     else
-        echo "DEM already adjusted and projected to proper UTM zone!"
+        echo "DEM already adjusted!"
     fi
     
 done < ${GCS_file}
 
+# Identify proper dems for imagery
+dem_vrt=${img%.*}_NED_13.vrt
+
+# Build vrt of dems if it does not exist
+if [ ! -f ${dem_vrt} ]; then
+    dems=$(grep '-adj' ${dem_list} | sort | uniq | wc -l)
+    echo "Building vrt of dems..."
+    gdalbuildvrt -input_file_list ${dem_list} ${dem_vrt}
+    echo "vrt successfully built"
+    
+else
+    echo "NED vrt already exists"
+fi
+
 if $cleanup ; then
-    rm -rv *arcsec* readme.pdf *meta* *thumb* *DataDictionary* ${NED_names} ${GCS_file} ${utm_file}
+    rm -rv *arcsec* readme.pdf *meta* *etadata* *thumb* *DataDictionary* ${NED_names} ${GCS_file} ${utm_file} ${dem_list}
 fi
