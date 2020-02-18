@@ -126,10 +126,12 @@ if $cleanup ; then
     if [ -e ${out_dir}readme.pdf ] ; then 
         rm -rv ${out_dir}*arcsec* ${out_dir}readme.pdf ${out_dir}*meta* ${out_dir}*etadata* ${out_dir}*thumb* ${out_dir}*DataDictionary*
     fi
+
     if [ -e ${NED_names} ] ; then
         rm ${NED_names} ${GCS_file} ${dem_list}
     fi
-    if [ -e *geoid*txt ] ; then
+    
+    if [ -e $(ls *geoid*txt | head -n 1 ) ] ; then
         rm *geoid*txt
     fi
 fi
