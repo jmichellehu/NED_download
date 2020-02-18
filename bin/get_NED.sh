@@ -13,9 +13,12 @@ img=$1
 # Output products directory (needs to include backslash)
 out_dir=$2
 
+# Switch to adjust dem geoid
+switch=$3
+
 # Check for correct number of inputs
-if [ "$#" -ne 2 ] ; then
-  echo "Usage is \`$(basename $0) img.ntf out_dir/\`"
+if [ "$#" -lt 2 ] ; then
+  echo "Usage is \`$(basename $0) img.ntf out_dir/ dem_geoid_adjust_switch\`"
   exit 1
 fi
 
@@ -23,6 +26,12 @@ fi
 if [ ! "${out_dir: -1}" == "/" ] ; then
     out_dir=${out_dir}/
     echo $out_dir
+fi
+
+# Add switch
+if [ -e ${switch} ] ; then
+    switch=0
+    echo ${switch}
 fi
 
 cleanup=true
@@ -77,14 +86,22 @@ do
         fi
     fi
     
-    # This is the dem version you need
-    dem=${standard_name%.*}-adj.tif
-    echo ${dem} >> ${dem_list}
+    if [ "${switch}" == "0" ] ; then
+        # This is the dem version you need
+        dem=${standard_name%.*}-adj.tif
+        echo ${dem} >> ${dem_list}
+    else
+        dem=${standard_name%.*}.tif
+        echo ${dem} >> ${dem_list}
+    fi
     
     if [ ! -e $dem ] ; then
-        if [ ! -e ${NED%.*}-adj.img ] ; then
+        if [ ! -e ${NED%.*}-adj.img ] && [ "${switch}" == "0" ] ; then
             dem_geoid --reverse-adjustment ${out_dir}${NED%.*}.img ; 
+        else
+            gdalwarp  ${out_dir}${NED%.*}.img ${dem}
         fi
+        
     else
         echo "DEM already adjusted!"
     fi
