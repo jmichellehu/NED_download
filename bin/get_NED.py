@@ -16,12 +16,14 @@ import json
 parser = argparse.ArgumentParser(description='Geographic Coordinate extractor')
 parser.add_argument('-in', '--input_file', help='GeoTiff image file', required=True)
 parser.add_argument('-NED', '--NED_resolution', help='GeoTiff image file', required=False)
-parser.add_argument('-json', '--json_input', help='JSON file', required=False)
+#parser.add_argument('-json', '--json_input', help='JSON boolean', required=False)
 
 args = parser.parse_args()
 in_fn = args.input_file
 NED = args.NED_resolution
-json_fn=args.json_input
+#json_fn = args.json_input
+
+json_fn = in_fn[:-4]+".json"
 
 # Define functions
 def round_down(n, decimals=2):
