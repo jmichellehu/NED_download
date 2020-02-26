@@ -98,6 +98,7 @@ do
     if [ ! -e $dem ] ; then
         if [ ! -e ${NED%.*}-adj.img ] && [ "${switch}" == "0" ] ; then
             dem_geoid --reverse-adjustment ${out_dir}${NED%.*}.img ; 
+            rm ${NED%.*}-log-dem_geoid*txt
         else
             gdalwarp  ${out_dir}${NED%.*}.img ${dem}
         fi
@@ -105,7 +106,7 @@ do
     else
         echo "DEM already adjusted!"
     fi
-    
+    printf "\n"
 done < ${GCS_file}
 
 # Identify proper dems for imagery
@@ -129,9 +130,5 @@ if $cleanup ; then
 
     if [ -e ${NED_names} ] ; then
         rm ${NED_names} ${GCS_file} ${dem_list}
-    fi
-    
-    if [ -e $(ls *geoid*txt | head -n 1 ) ] ; then
-        rm *geoid*txt
     fi
 fi
