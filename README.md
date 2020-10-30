@@ -1,5 +1,6 @@
 # NED_download
-Tool to download [NED tiles]() (1/3 arc-second is default, 1 arc-second option exists) containing input imagery extents and create NED DEM vrt.  
+Tool to download 3D Elevation Program ([3DEP](https://www.usgs.gov/core-science-systems/ngp/3dep)), previously known as the National Elevation Dataset (NED), tiles (1/3 arc-second is default, 1 arc-second option exists) using input imagery extents to create a DEM vrt.  
+
 ## Requirements
 gdal: `conda install gdal`  
 tested on versions 2.4.1 and 2.0.2
