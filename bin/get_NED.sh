@@ -47,7 +47,6 @@ NED_names=${img%.*}_NED.txt
 # List of tiles to build DEM vrt for image
 dem_list=${img%.*}_dem_list.txt
 
-
 echo "    2    Extracting geographic coordinates"
 # Extract geographic coordinates for the input image
 python $HOME/git_dirs/NED_download/bin/get_NED.py -in ${img} -NED 13 2>&1 | tee ${GCS_file}
@@ -127,11 +126,9 @@ dem_vrt=${img%.*}_NED_13.vrt
 
 # Build vrt of dems if it does not exist
 if [ ! -e ${dem_vrt} ]; then
-#     dems=$(grep 'adj' ${dem_list} | sort | uniq | wc -l) # Can't recall what this was for...
     echo "Building vrt of dems..."
     gdalbuildvrt -input_file_list ${dem_list} ${dem_vrt}
     echo "vrt successfully built"
-    
 else
     echo "NED vrt already exists"
 fi
